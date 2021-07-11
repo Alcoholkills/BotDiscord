@@ -3,30 +3,29 @@ import configparser
 import random
 
 from discord.ext import commands
+from discord.flags import Intents
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 discordSection = config["DISCORD"]
 botToken = discordSection["token"]
 
-bot = commands.Bot(command_prefix='!')
+# intents = discord.Intents.default()
+intents = discord.Intents(messages=True, guilds=True, members=True)
 
-# bot = discord.Client()
-# @client.event
-# async def on_ready():
-#     print(f'{client.user} has connected to Discord!')
-    
-# @client.event
-# async def on_message(message):
-#     if message.author == client.user:
-#         print("on_message - return")
-#         return
-#     print("on_message - await")
-#     await message.channel.send("asagi !")
+bot = commands.Bot(command_prefix='!', intents=intents)
+# bot = commands.Bot(command_prefix="!")
 
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    
+@bot.command(name="members", help="List all guild members")
+async def members(ctx):
+    response = "Here's a list of all members:\n"
+    for guildMember in bot.get_all_members():
+        response += f" - {guildMember}\n"
+    await ctx.send(response)
 
 @bot.command(name='boo', help='Try your luck at this lucky scary draw ;)')
 async def booFunc(ctx):
@@ -65,7 +64,6 @@ async def rrollMe(ctx):
 
 @bot.command(name="shifumi", help="Play a game of shifumi with me :D ; play 'paper', 'cissors', 'stone'")
 async def shifumiMe(ctx, hand = "") :
-    # A faire avec un dictionnaire
     moveListe = {"paper":"cissors", "cissors":"stone", "stone":"paper"}
     if hand == "":
         await ctx.send("You need to play something !!'")
@@ -81,10 +79,23 @@ async def shifumiMe(ctx, hand = "") :
     else:
         await ctx.send(f"I use {botRoll}\nYou're an instopalbe winner ;D !!")
         
-    
+@bot.command(name="rshifumi", help="A genius cannot lose this simple game called shifumi")
+async def rshifumi(ctx, hand = ""):
+    moveListe = {"paper":"cissors", "cissors":"stone", "stone":"paper"}
+    if hand == "":
+        await ctx.send("You need to play something ; scared of losing ?'")
+        return
+    if hand not in moveListe:
+        await ctx.send("Not a legal move, please try 'paper', 'cissors', 'stone'\nAre you trying to cheat ?")
+        return
+    await ctx.send(f"I use {moveListe[hand]}\nSorry, you lose ; but you had no chance ...")
     
 # Faire un blackjack
-    
+# @bot.command(name="blackjack", help="Play a game of blackjack with me !\nDraw cards (!d) until you you want to stop (!s) and try to get 21.\nI'll play after you, and the winner is the closest to 21.\nIf you go over 21, you automatically lose !!")
+# async def blackjack(ctx):
+#     await ctx.send("Blackjack starts ; start to draw cards with !d, and stop with !s")
+#     @bot.command(name="d")
+#     return    
     
     
 
